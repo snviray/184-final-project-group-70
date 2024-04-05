@@ -16,6 +16,11 @@ public class Cell : MonoBehaviour
     public GameObject front;
     public GameObject back;
 
+    // cell's attributes
+    public float testNumber;
+    public Vector3 densityCurrent;
+    public Vector3 densityPast;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -91,4 +96,30 @@ public class Cell : MonoBehaviour
         }
         return null;
     }
+    
+    List<GameObject> GetAllNeighbors()
+    { 
+        List<GameObject> neighbors = new List<GameObject>();
+        if (right != null) {
+            neighbors.Add(right);
+        }
+        if (left != null) {
+            neighbors.Add(left);
+        }
+        if (front != null) {
+            neighbors.Add(front);
+        }
+        if (back != null) {
+            neighbors.Add(back);
+        }
+        if (up != null) {
+            neighbors.Add(up);
+        }
+        if (down != null) {
+            neighbors.Add(down);
+        }
+
+        return neighbors;
+    }
+    
 }

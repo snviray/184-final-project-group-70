@@ -53,4 +53,24 @@ public class FluidGrid : MonoBehaviour
     {
         
     }
+
+    void Diffuse() {
+        //TODO: define dt, diff, N later
+        int k;
+        float a = dt * diff * N * N * N;
+
+        GameObject[] cells = GameObject.FindGameObjectsWithTag("cell");
+        for (k = 0; k < 20; k++) {
+            for (int i = 0; i < cells.Length; i++) {
+                Cell currCell = cells[i].GetComponent<Cell>();
+                float densitySum = 0;
+                GameObject[] neighbors = currCell.GetAllNeighbors();
+                for (int s = 0; s < neighbors.Length; s++) {
+                    densitySum += neighbors[s];
+                }
+                currCell.densityCurrent = (currCell.densityPast + a * densitySum) / (1 + 4 * a)
+            }
+            // set_bnd
+        }
+    }
 }
