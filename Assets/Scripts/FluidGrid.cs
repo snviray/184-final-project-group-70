@@ -46,6 +46,7 @@ public class FluidGrid : MonoBehaviour
         cell.transform.localScale = new Vector3(cubeDimension, cubeDimension, cubeDimension);
         // update cell components
         cell.GetComponent<Cell>().locationIndices = new Vector3(x, y, z);
+        cell.GetComponent<Cell>().testNumber = Random.value;
     }
 
     // Update is called once per frame

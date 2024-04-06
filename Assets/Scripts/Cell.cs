@@ -16,6 +16,13 @@ public class Cell : MonoBehaviour
     public GameObject front;
     public GameObject back;
 
+    // cell's attributes
+    public float testNumber;
+    public Vector3 densityCurrent;
+    public Vector3 densityPast;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +34,8 @@ public class Cell : MonoBehaviour
         down = FindDownNeighbor();
         front = FindFrontNeighbor();
         back = FindBackNeighbor();
+        Color oldColor = gameObject.GetComponent<Renderer>().material.color;
+        gameObject.GetComponent<Renderer>().material.color = new Color(Color.blue.r, Color.blue.g, Color.blue.b,testNumber);
     }
 
     // Update is called once per frame
