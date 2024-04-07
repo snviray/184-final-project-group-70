@@ -12,8 +12,8 @@ public class FluidGrid : MonoBehaviour
     [SerializeField]
     GameObject cellPrefab;
     
-    public float dt = 1.0f; // time step
-    public float diff  = 0.5f; // diffusion constant
+    public float dt = 0.1f; // time step
+    public float diff  = 0.000001f; // diffusion constant
     
     [SerializeField]
     public int N; 
@@ -22,7 +22,7 @@ public class FluidGrid : MonoBehaviour
     private int gridY; 
     private int gridZ; 
 
-    private float timer = 0f;
+    public float timer = 0f;
 
 
     // boundary cells, excluding corners
@@ -35,8 +35,8 @@ public class FluidGrid : MonoBehaviour
     public Dictionary<Vector3, GameObject> cornerCells = new Dictionary<Vector3, GameObject>(); 
     public List<Vector3> cornerCellsIndices = new List<Vector3>(); 
     
-    // corners
 
+    private bool done = false;
 
 
     // Start is called before the first frame update
@@ -48,7 +48,6 @@ public class FluidGrid : MonoBehaviour
         gridY = N + 2;
         gridZ = N + 2;
         cubeDimension = (float) 1 / N;
-        Debug.Log(cubeDimension);
         cornerCellsIndices.Add(new Vector3(0, 0, 0));
         cornerCellsIndices.Add(new Vector3(0, 0, N + 1));
         cornerCellsIndices.Add(new Vector3(N + 1, 0, 0));
@@ -69,9 +68,7 @@ public class FluidGrid : MonoBehaviour
     {
         timer += Time.deltaTime;
         if (timer >= dt) {
-            AddSource();
-            Diffuse();
-            RenderCells();
+            DensityStep();
             timer = timer - dt;
         }
     }
@@ -142,32 +139,33 @@ public class FluidGrid : MonoBehaviour
                 for (int s = 0; s < neighbors.Count; s++) {
                     densitySum += neighbors[s].GetComponent<Cell>().densityCurrent;
                 }
-                currCell.densityCurrent = (currCell.densityPast + a * densitySum) / (1 + 4 * a);
-                if (currCell.densityCurrent > maxDensity) {
-                    maxDensity = currCell.densityCurrent;
-                }
+                currCell.densityAdded = (currCell.densityCurrent + a * densitySum) / (1 + 4 * a);
             }
         }
         
 
-        // normalize all cell's densities
-        // probably want to change later to be more accurate
-        for (int i = 0; i < cells.Length; i++) {
-                Cell currCell = cells[i].GetComponent<Cell>();
-                currCell.densityCurrent = currCell.densityCurrent / maxDensity;
+        // // normalize all cell's densities
+        // // probably want to change later to be more accurate
+        // for (int i = 0; i < cells.Length; i++) {
+        //         Cell currCell = cells[i].GetComponent<Cell>();
+        //         currCell.densityCurrent = currCell.densityCurrent / maxDensity;
                 
-        } 
+        // } 
 
         SetBndDensity();
     }
 
     void AddSource()
     { 
+        float x0;
+        float x; 
         GameObject[] cells = GameObject.FindGameObjectsWithTag("cell");
         for (int i = 0; i < cells.Length; i++) {
             Cell currCell = cells[i].GetComponent<Cell>();
-            currCell.densityCurrent = currCell.densityCurrent + currCell.densityAdded;
-            currCell.ClearDensityAdded();
+            x = currCell.densityCurrent;
+            x0 = currCell.densityAdded;
+            currCell.densityCurrent = x + x0 * dt;
+            currCell.densityPast = x;
         }
     }
 
@@ -275,5 +273,13 @@ public class FluidGrid : MonoBehaviour
 
 // c8.down.GetComponent<Cell>().densityCurrent i dont know why adding this makes it error
 
+    }
+
+    void DensityStep()
+    { 
+        AddSource();
+        Diffuse();
+        // TODO Advect
+        RenderCells();
     }
 }
