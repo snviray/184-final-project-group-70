@@ -13,7 +13,7 @@ public class FluidGrid : MonoBehaviour
     GameObject cellPrefab;
     
     public float dt = 0.1f; // time step
-    public float diff  = 0.000001f; // diffusion constant
+    public float diff  = 10f; // diffusion constant
     
     [SerializeField]
     public int N; 
@@ -128,8 +128,6 @@ public class FluidGrid : MonoBehaviour
         int k;
         float a = dt * diff * N * N * N;
 
-        float maxDensity = 1f;
-
         GameObject[] cells = GameObject.FindGameObjectsWithTag("cell");
         for (k = 0; k < 20; k++) {
             for (int i = 0; i < cells.Length; i++) {
@@ -139,18 +137,9 @@ public class FluidGrid : MonoBehaviour
                 for (int s = 0; s < neighbors.Count; s++) {
                     densitySum += neighbors[s].GetComponent<Cell>().densityCurrent;
                 }
-                currCell.densityAdded = (currCell.densityCurrent + a * densitySum) / (1 + 4 * a);
+                currCell.densityAdded = (currCell.densityCurrent + a * densitySum) / (1 + 6 * a);
             }
         }
-        
-
-        // // normalize all cell's densities
-        // // probably want to change later to be more accurate
-        // for (int i = 0; i < cells.Length; i++) {
-        //         Cell currCell = cells[i].GetComponent<Cell>();
-        //         currCell.densityCurrent = currCell.densityCurrent / maxDensity;
-                
-        // } 
 
         SetBndDensity();
     }
@@ -162,10 +151,9 @@ public class FluidGrid : MonoBehaviour
         GameObject[] cells = GameObject.FindGameObjectsWithTag("cell");
         for (int i = 0; i < cells.Length; i++) {
             Cell currCell = cells[i].GetComponent<Cell>();
-            x = currCell.densityCurrent;
             x0 = currCell.densityAdded;
-            currCell.densityCurrent = x + x0 * dt;
-            currCell.densityPast = x;
+            currCell.densityCurrent = x0;
+            // currCell.ClearDensityAdded();
         }
     }
 
@@ -184,27 +172,27 @@ public class FluidGrid : MonoBehaviour
         // normal boundary cells are the 
         for (int i = 0; i < bottomCells.Count; i++) {
             Cell currCell = bottomCells[i].GetComponent<Cell>();
-            currCell.densityCurrent = currCell.up.GetComponent<Cell>().densityCurrent;
+            currCell.densityAdded = currCell.up.GetComponent<Cell>().densityAdded;
         }
         for (int i = 0; i < topCells.Count; i++) {
             Cell currCell = topCells[i].GetComponent<Cell>();
-            currCell.densityCurrent = currCell.down.GetComponent<Cell>().densityCurrent;
+            currCell.densityAdded = currCell.down.GetComponent<Cell>().densityAdded;
         }
         for (int i = 0; i < leftCells.Count; i++) {
             Cell currCell = leftCells[i].GetComponent<Cell>();
-            currCell.densityCurrent = currCell.right.GetComponent<Cell>().densityCurrent;
+            currCell.densityAdded = currCell.right.GetComponent<Cell>().densityAdded;
         }
         for (int i = 0; i < rightCells.Count; i++) {
             Cell currCell = rightCells[i].GetComponent<Cell>();
-            currCell.densityCurrent = currCell.left.GetComponent<Cell>().densityCurrent;
+            currCell.densityAdded = currCell.left.GetComponent<Cell>().densityAdded;
         }
         for (int i = 0; i < frontCells.Count; i++) {
             Cell currCell = frontCells[i].GetComponent<Cell>();
-                currCell.densityCurrent = currCell.back.GetComponent<Cell>().densityCurrent;
+                currCell.densityAdded = currCell.back.GetComponent<Cell>().densityAdded;
         }
         for (int i = 0; i < backCells.Count; i++) {
             Cell currCell = backCells[i].GetComponent<Cell>();
-            currCell.densityCurrent = currCell.front.GetComponent<Cell>().densityCurrent;
+            currCell.densityAdded = currCell.front.GetComponent<Cell>().densityAdded;
         }
 
         // corners are average of surrounding cells
@@ -214,14 +202,14 @@ public class FluidGrid : MonoBehaviour
         GameObject c1Object = cornerCells[v1];
         Cell c1 = c1Object.GetComponent<Cell>();
         // average of right, top, and back 
-        c1.densityCurrent =  0.33f * (c1.right.GetComponent<Cell>().densityCurrent + c1.up.GetComponent<Cell>().densityCurrent + c1.back.GetComponent<Cell>().densityCurrent);
+        c1.densityAdded =  0.33f * (c1.right.GetComponent<Cell>().densityAdded + c1.up.GetComponent<Cell>().densityAdded + c1.back.GetComponent<Cell>().densityAdded);
 
         // (0, 0, 1)
         Vector3 v2 = new Vector3(0, 0, N + 1);
         GameObject c2Object = cornerCells[v2];
         Cell c2 = c2Object.GetComponent<Cell>();
         // average of front, right, and top 
-        c2.densityCurrent =  0.33f * (c2.front.GetComponent<Cell>().densityCurrent + c2.right.GetComponent<Cell>().densityCurrent + c2.up.GetComponent<Cell>().densityCurrent);
+        c2.densityAdded =  0.33f * (c2.front.GetComponent<Cell>().densityAdded + c2.right.GetComponent<Cell>().densityAdded + c2.up.GetComponent<Cell>().densityAdded);
 
 
         // (0, 1, 0)
@@ -229,7 +217,7 @@ public class FluidGrid : MonoBehaviour
         GameObject c3Object = cornerCells[v3];
         Cell c3 = c3Object.GetComponent<Cell>();
         // average of bottom, back, and right
-        c3.densityCurrent =  0.33f * (c3.down.GetComponent<Cell>().densityCurrent + c3.back.GetComponent<Cell>().densityCurrent + c3.right.GetComponent<Cell>().densityCurrent);
+        c3.densityAdded =  0.33f * (c3.down.GetComponent<Cell>().densityAdded + c3.back.GetComponent<Cell>().densityAdded + c3.right.GetComponent<Cell>().densityAdded);
 
 
         // (0, 1, 1)
@@ -237,7 +225,7 @@ public class FluidGrid : MonoBehaviour
         GameObject c4Object = cornerCells[v4];
         Cell c4 = c4Object.GetComponent<Cell>();
         // average of front, right, and bottom
-        c4.densityCurrent =  0.33f * (c4.front.GetComponent<Cell>().densityCurrent + c4.right.GetComponent<Cell>().densityCurrent + c4.down.GetComponent<Cell>().densityCurrent);
+        c4.densityCurrent =  0.33f * (c4.front.GetComponent<Cell>().densityAdded + c4.right.GetComponent<Cell>().densityAdded + c4.down.GetComponent<Cell>().densityAdded);
 
 
         // (1, 1, 0)
@@ -245,7 +233,7 @@ public class FluidGrid : MonoBehaviour
         GameObject c5Object = cornerCells[v5];
         Cell c5 = c5Object.GetComponent<Cell>();
         // back, left, bottom
-        c5.densityCurrent =  0.33f * (c5.back.GetComponent<Cell>().densityCurrent + c5.left.GetComponent<Cell>().densityCurrent + c5.down.GetComponent<Cell>().densityCurrent);
+        c5.densityAdded =  0.33f * (c5.back.GetComponent<Cell>().densityAdded + c5.left.GetComponent<Cell>().densityAdded + c5.down.GetComponent<Cell>().densityAdded);
 
 
         // (1, 0, 0)
@@ -253,7 +241,7 @@ public class FluidGrid : MonoBehaviour
         GameObject c6Object = cornerCells[v6];
         Cell c6 = c6Object.GetComponent<Cell>();
         // top, left , back
-        c6.densityCurrent =  0.33f * (c6.up.GetComponent<Cell>().densityCurrent + c6.left.GetComponent<Cell>().densityCurrent + c6.back.GetComponent<Cell>().densityCurrent);
+        c6.densityAdded =  0.33f * (c6.up.GetComponent<Cell>().densityAdded + c6.left.GetComponent<Cell>().densityAdded + c6.back.GetComponent<Cell>().densityAdded);
 
         
         // (1, 0, 1)
@@ -261,7 +249,7 @@ public class FluidGrid : MonoBehaviour
         GameObject c7Object = cornerCells[v7];
         Cell c7 = c7Object.GetComponent<Cell>();
         // front, top, left
-        c7.densityCurrent =  0.33f * (c7.front.GetComponent<Cell>().densityCurrent + c7.up.GetComponent<Cell>().densityCurrent + c7.left.GetComponent<Cell>().densityCurrent);
+        c7.densityAdded =  0.33f * (c7.front.GetComponent<Cell>().densityAdded + c7.up.GetComponent<Cell>().densityAdded + c7.left.GetComponent<Cell>().densityAdded);
 
 
         // (1, 1, 1)
@@ -269,7 +257,7 @@ public class FluidGrid : MonoBehaviour
         GameObject c8Object = cornerCells[v8];
         Cell c8 = c8Object.GetComponent<Cell>();
         // front, bottom, left
-        c8.densityCurrent =  0.5f * (c8.front.GetComponent<Cell>().densityCurrent +  c8.left.GetComponent<Cell>().densityCurrent);
+        c8.densityAdded =  0.5f * (c8.front.GetComponent<Cell>().densityAdded +  c8.left.GetComponent<Cell>().densityAdded);
 
 // c8.down.GetComponent<Cell>().densityCurrent i dont know why adding this makes it error
 

@@ -50,7 +50,7 @@ public class Cell : MonoBehaviour
     { 
         if (Input.GetMouseButtonDown(0))
         { 
-            AddSourceToCell(0.5f); // todo, change this later to maybe be user input in a UI box
+            AddSourceToCell(0.9f); // todo, change this later to maybe be user input in a UI box
         }
     }
 
