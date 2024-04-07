@@ -21,7 +21,7 @@ public class Cell : MonoBehaviour
     public float densityCurrent;
     public float densityPast;
 
-    public float densityAdded; // accumulate added density to be added on the timestep
+    public float densitySource; // accumulate added density to be added on the timestep
 
     public float currSource; // fill if the user clicks on this, clear after processing
 
@@ -141,14 +141,7 @@ public class Cell : MonoBehaviour
     {
         Debug.Log("added density to ");
         Debug.Log(locationIndices);
-        densityAdded = densityAdded + source; 
-    }
-
-
-    // clear added density
-    public void ClearDensityAdded() 
-    {
-        densityAdded = 0f;
+        densitySource = densitySource + source; 
     }
 
     public void RenderDensity() // might want to change rendering later

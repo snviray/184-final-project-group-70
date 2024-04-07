@@ -339,8 +339,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellPrefab: {fileID: 3478131785361557578, guid: d838c94a4a31449419772788c44185da, type: 3}
-  dt: 0.5
-  diff: 100000
+  dt: 0.1
+  diff: 9e+9
   N: 20
   timer: 0
   bottomCells: []
