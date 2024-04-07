@@ -18,15 +18,16 @@ public class Cell : MonoBehaviour
 
     // cell's attributes
     public float testNumber;
-    public Vector3 densityCurrent;
-    public Vector3 densityPast;
+    public float densityCurrent;
+    public float densityPast;
 
+    public float densityAdded; // accumulate added density to be added on the timestep
 
+    public float currSource; // fill if the user clicks on this, clear after processing
 
     // Start is called before the first frame update
     void Start()
     {
-
         // find neighbors
         right = FindRightNeighbor();
         left = FindLeftNeighbor();
@@ -34,14 +35,23 @@ public class Cell : MonoBehaviour
         down = FindDownNeighbor();
         front = FindFrontNeighbor();
         back = FindBackNeighbor();
-        Color oldColor = gameObject.GetComponent<Renderer>().material.color;
-        gameObject.GetComponent<Renderer>().material.color = new Color(Color.blue.r, Color.blue.g, Color.blue.b,testNumber);
+        gameObject.GetComponent<Renderer>().enabled = false; // set this when the density is non zero
+        densityCurrent = 0f;
+        densityPast = 0f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+
+    void OnMouseDown() 
+    { 
+        if (Input.GetMouseButtonDown(0))
+        { 
+            AddSourceToCell(0.5f); // todo, change this later to maybe be user input in a UI box
+        }
     }
 
     // Note: To get these to work, I made the prefab's collision box smaller
@@ -86,7 +96,7 @@ public class Cell : MonoBehaviour
     GameObject FindFrontNeighbor() 
     {
         RaycastHit hit;
-        if (Physics.Raycast(gameObject.transform.position, new Vector3(0, 0, 0.5f), out hit) && hit.collider.gameObject.tag == "cell") {
+        if (Physics.Raycast(gameObject.transform.position, new Vector3(0, 0, -0.5f), out hit) && hit.collider.gameObject.tag == "cell") {
             return hit.collider.gameObject;
         }
         return null;
@@ -95,9 +105,62 @@ public class Cell : MonoBehaviour
     GameObject FindBackNeighbor() 
     {
         RaycastHit hit;
-        if (Physics.Raycast(gameObject.transform.position, new Vector3(0, 0, -0.5f), out hit) && hit.collider.gameObject.tag == "cell") {
+        if (Physics.Raycast(gameObject.transform.position, new Vector3(0, 0, 0.5f), out hit) && hit.collider.gameObject.tag == "cell") {
             return hit.collider.gameObject;
         }
         return null;
     }
+    
+    public List<GameObject> GetAllNeighbors()
+    { 
+        List<GameObject> neighbors = new List<GameObject>();
+        if (right != null) {
+            neighbors.Add(right);
+        }
+        if (left != null) {
+            neighbors.Add(left);
+        }
+        if (front != null) {
+            neighbors.Add(front);
+        }
+        if (back != null) {
+            neighbors.Add(back);
+        }
+        if (up != null) {
+            neighbors.Add(up);
+        }
+        if (down != null) {
+            neighbors.Add(down);
+        }
+
+        return neighbors;
+    }
+    
+    // accumulate source to a cell to be added on the next timestep
+    public void AddSourceToCell(float source) 
+    {
+        Debug.Log("added density to ");
+        Debug.Log(locationIndices);
+        densityAdded = densityAdded + source; 
+    }
+
+
+    // clear added density
+    public void ClearDensityAdded() 
+    {
+        densityAdded = 0f;
+    }
+
+    public void RenderDensity() // might want to change rendering later
+    {
+        if (densityCurrent > 0.01f) 
+        {
+            gameObject.GetComponent<Renderer>().enabled = true; 
+            gameObject.GetComponent<Renderer>().material.color = new Color(Color.blue.r, Color.blue.g, Color.blue.b, densityCurrent);
+        } else {
+            gameObject.GetComponent<Renderer>().enabled = false;
+        }
+         
+    }
+
 }
