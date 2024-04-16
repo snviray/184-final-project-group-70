@@ -23,6 +23,8 @@ public class FluidGrid : MonoBehaviour
     private int gridZ;
     public float timer = 0f;
 
+    GameObject source;
+
     // boundary cells, excluding corners
     public List<GameObject> bottomCells = new List<GameObject>();
     public List<GameObject> topCells = new List<GameObject>();
@@ -67,15 +69,13 @@ public class FluidGrid : MonoBehaviour
             // chosen.GetComponent<Cell>().AddSourceToCell(Random.Range(0f, 0.99f));
             
             // add density and velocity to random cell
-            if (Random.Range(0, 100) < 50) {
-                int ind = Random.Range(0, nonBoundaryCells.Count);
-                int ind2 = Random.Range(0, nonBoundaryCells.Count);
-                nonBoundaryCells[ind].GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f,0f));
-                if (Random.Range(0, 100) < 50 || !added) {
-                    nonBoundaryCells[ind].GetComponent<Cell>().AddSourceToCell(4f);
-                    added = true;
-                }
-            }
+            // if (Random.Range(0, 100) < 50) {
+            source.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f, 0f));
+            // if (Random.Range(0, 100) < 50 || !added) {
+            source.GetComponent<Cell>().AddSourceToCell(5f);
+            added = true;
+            // }
+            // }
 
             VelocityStep();
             DensityStep();
@@ -112,6 +112,10 @@ public class FluidGrid : MonoBehaviour
         if (cornerCellsIndices.Contains(locIndices)) {
             cornerCells.Add(locIndices, cell);
             return;
+        }
+
+        if (locIndices == new Vector3(5, 1, 5)) {
+            source = cell;
         }
         // add to array of boundary cells if necessary
         if (x == 0) {

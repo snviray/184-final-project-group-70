@@ -145,14 +145,14 @@ public class Cell : MonoBehaviour
 
    public void RenderDensity() // might want to change rendering later
    {
-        densityCurrent = Mathf.Max(0.012f, densityCurrent);
-       if (densityCurrent > 0.01f) {
-        gameObject.GetComponent<Renderer>().enabled = true;
-        Color c = GetComponent<Renderer>().material.color = Color.blue;
-        gameObject.GetComponent<Renderer>().material.color = new Color(c.r, c.g, c.b, Mathf.Min(densityCurrent, 1.0f));
-       } else {
-        gameObject.GetComponent<Renderer>().enabled = false;
-       }
+        // densityCurrent = Mathf.Max(0.012f, densityCurrent);
+        if (densityCurrent > 0.05f) {
+            gameObject.GetComponent<Renderer>().enabled = true;
+            Color c = GetComponent<Renderer>().material.color = Color.blue;
+            gameObject.GetComponent<Renderer>().material.color = new Color(c.r, c.g, c.b, Mathf.Min(densityCurrent, 1.0f));
+        } else {
+            gameObject.GetComponent<Renderer>().enabled = false;
+        }
       
    }
 
