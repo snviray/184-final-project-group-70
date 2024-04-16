@@ -47,7 +47,7 @@
 
     <!-- Abstract -->
     <section id="abstract" class="container mt-5">
-        <h2>Abstract</h2>
+        <h2>Current Accomplishments</h2>
         <p>We have made significant progress on our fluid dynamics simulation. We began by setting up our 3D grid to split up the visual space into blocks, each with a dynamic velocity and density and front, back, up, down, left, and right neighbors to create relationships between each cell. Next, we implemented a method to calculate the change in density for each block assuming a constant velocity field and outside sources added. To simulate exchanges in densities between a cell and its neighbors, we implemented diffusion via an iterative solver called Gauss-Seidel relaxation. In order to simulate the density flow given a velocity field, we then implemented advection, which followed a linear backtrace approach, in which we represent the densities as particles and trace its path back through the velocity field. We then focused our efforts on writing the velocity solver, which models a change in velocity based on the addition of forces, viscous diffusion and self-advection. We updated the velocities for each cell similarly to diffusion, however, we implemented an additional method project(), also using Gauss-Seidel relaxation in order to model incompressibility and enforce mass conservation. Lastly, we implemented the SetBoundary() function for each cell’s density and velocity to simulate the fluid being contained.
         </p>
         <section class="container mt-5">
