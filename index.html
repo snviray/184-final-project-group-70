@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Simulation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">CS 184</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#abstract">Abstract</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#results">Results</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#reflection">Reflection</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="container mt-5">
+        <h1 class="text-center">Final Project MileStone: Water Simulation</h1>
+        <h6 class="text-center">Sara Viray, Sue Young Shim, Amrita Moturi, Mariana Vasquez</h6>
+    </header>
+
+    <!-- Abstract -->
+    <section id="abstract" class="container mt-5">
+        <h2>Current Accomplishments</h2>
+        <p>We have made significant progress on our fluid dynamics simulation. We began by setting up our 3D grid to split up the visual space into blocks, each with a dynamic velocity and density and front, back, up, down, left, and right neighbors to create relationships between each cell. Next, we implemented a method to calculate the change in density for each block assuming a constant velocity field and outside sources added. To simulate exchanges in densities between a cell and its neighbors, we implemented diffusion via an iterative solver called Gauss-Seidel relaxation. In order to simulate the density flow given a velocity field, we then implemented advection, which followed a linear backtrace approach, in which we represent the densities as particles and trace its path back through the velocity field. We then focused our efforts on writing the velocity solver, which models a change in velocity based on the addition of forces, viscous diffusion and self-advection. We updated the velocities for each cell similarly to diffusion, however, we implemented an additional method project(), also using Gauss-Seidel relaxation in order to model incompressibility and enforce mass conservation. Lastly, we implemented the SetBoundary() function for each cell’s density and velocity to simulate the fluid being contained.
+        </p>
+        <section class="container mt-5">
+            <h5>Navier-Stokes Equations</h5>
+            <div class="mt-3">
+                <div>\[
+                    \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\frac{1}{\rho} \nabla p + \nu \nabla^2 \mathbf{u}
+                \]</div>
+            </div>
+        </section>
+        <section class="container mt-5">
+            <h5>Equation for Density Moving Through Velocity Field</h5>
+            <div class="mt-3">
+                <div>\[
+                    \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0
+                \]</div>
+            </div>
+        </section>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="container mt-5">
+        <h2>Results</h2>
+        <p>
+            Our current results showcase our simulation in Unity, in which a user can add fluid particles to the scene. The user can modify the fluid’s density and velocity to model the movement of different particles based on their properties and the Navier-Stokes equations. Clicking on the Unity display will render a water particle randomly generated in space, which diffuses into the nearby areas based on our diffusion function. The “swirling” effect is the result of implementing advect() and project(), which enforces the velocity to be mass conserving, forcing the flow to have this vortex appearance. The user can also modify simulation settings to modify the diffusion rates, fluid viscosity, the total number of grid cells, and timestep.
+        </p>
+    </section>
+
+    <!-- Reflection -->
+    <section id="reflection" class="container mt-5">
+        <h2>Reflection</h2>
+        <p>When our team first started writing code, we were primarily concerned with structuring the files in a way that best made sense for our simulation goals. Our team landed on having a FluidCells.cs file for the main functions of the overall simulation and a Cell.cs file that would define variables and methods for a single Cell instance (representing a single block of water). This choice of structure differs from the paper that we are implementing so we had to account for these differences when implementing main functions such as project and advect. We are on target with our initial work plan, having implemented the 3D grid with distance, get neighbors, linear interpolation operations with velocity grid visualization, and finally the density and velocity solver. We would still like to implement Unity Shaders with reflection and add external forces like gravity to make the renderings more realistic.</p>
+        <p>An issue we ran into was adapting the pseudocode from the paper to Unity objects. Since we have chosen to use Unity as our renderer, we needed to make the approriate changes to follow the proper syntax. On the other hand, the paper uses its own custom GUI.</p>
+        <p>Another issue we faced was coming up with a way to render the density in a visually realistic manner. We have played around with the opacity to resolve this and changing other variables but we are still working through this issue.</p>
+    </section>
+
+    <!-- Updated Work Plan -->
+    <section id="reflection" class="container mt-5">
+        <h2>Updated Work Plan</h2>
+        <ul class="mt-3">
+            <li>
+                Week 3 (4/17 - 4/23) (Milestone Feedback Sent: Thursday, April 18th, by EOD.)
+            </li>
+            <ul>
+                <li>Implement shader (with noise)</li>
+                <ul>
+                    <li>Shader with Reflection</li>
+                    <li>Add Gravity</li>
+                </ul>
+                <li>Build final simulation scenes</li>
+                <ul>
+                    <li>Build pretty scene/find free assets</li>
+                </ul>          
+                <li>Debug and stretch goals if possible</li>
+            </ul>
+            <li>
+                Week 4 (4/24 - 4/30) (Final Deliverables (Report & Video) Due: Tuesday, April 30th at 11:59 pm)
+            </li>
+            <ul>
+                <li>Implement shader (with noise)</li>
+                <ul>
+                    <li>Shader with Reflection</li>
+                    <li>Add Gravity</li>
+                </ul>
+                <li>Create video</li>
+                <li>Create slides</li>
+            </ul>
+            <li>
+                Final Presentations: May 2nd-3rd
+            </li>
+        </ul>
+    </section>
+
+    <!-- Video -->
+    <section class="container mt-5">
+        <h2>Video</h2>
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="simulation_video.mp4"
+                allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- Presentation Slides -->
+    <section class="container mt-5">
+        <h2>Presentation Slides</h2>
+        <!-- You can embed your slides here -->
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSbUgze5gTW2t5L7ZZ6UbZHDV937gO-A0ITlgzC204dNAcA9mpM-r5hSJLbULLnOh-q0wnDgevmL_gY/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-3">
+        <div class="container text-center">
+            <p>&copy; 2024 CS184 Final Project. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
