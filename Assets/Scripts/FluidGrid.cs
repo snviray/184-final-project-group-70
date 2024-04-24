@@ -65,17 +65,19 @@ public class FluidGrid : MonoBehaviour
         timer += Time.deltaTime;
         if (timer >= dt) {
             // every timestep generate a source in a random Source
-            // GameObject chosen = nonBoundaryCells[(int) Random.Range(0, nonBoundaryCells.Count - 1)];
+            GameObject chosen = nonBoundaryCells[(int) Random.Range(0, nonBoundaryCells.Count - 1)];
             // chosen.GetComponent<Cell>().AddSourceToCell(Random.Range(0f, 0.99f));
             
             // add density and velocity to random cell
-            // if (Random.Range(0, 100) < 50) {
-            source.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f, 0f));
-            // if (Random.Range(0, 100) < 50 || !added) {
-            source.GetComponent<Cell>().AddSourceToCell(5f);
-            added = true;
-            // }
-            // }
+            if (Random.Range(0, 100) < 50) {
+                // chosen.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f, 0f));
+                // source.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f, 0f));
+            if (Random.Range(0, 100) < 50 || !added) {
+                source.GetComponent<Cell>().AddSourceToCell(5f);
+                // chosen.GetComponent<Cell>().AddSourceToCell(1f);
+                added = true;
+            }
+            }
 
             VelocityStep();
             DensityStep();
@@ -114,7 +116,7 @@ public class FluidGrid : MonoBehaviour
             return;
         }
 
-        if (locIndices == new Vector3(5, 1, 5)) {
+        if (locIndices == new Vector3(5, 9, 5)) {
             source = cell;
         }
         // add to array of boundary cells if necessary
@@ -203,7 +205,7 @@ public class FluidGrid : MonoBehaviour
         {
             int k;
             float a = dt * diff * N * N * N;
-            for (k = 0; k < 20; k++) {
+            for (k = 0; k < 10; k++) {
                 for (int i = 0; i < nonBoundaryCells.Count; i++) {
                     Cell currCell = nonBoundaryCells[i].GetComponent<Cell>();
                     float densitySum = 0;
@@ -224,7 +226,7 @@ public class FluidGrid : MonoBehaviour
             // x dimension
             int k;
             float a = dt * visc * N * N * N;
-            for (k = 0; k < 20; k++) {
+            for (k = 0; k < 10; k++) {
                 for (int i = 0; i < nonBoundaryCells.Count; i++) {
                     Cell currCell = nonBoundaryCells[i].GetComponent<Cell>();
                     float velocitySum = 0;
@@ -252,7 +254,7 @@ public class FluidGrid : MonoBehaviour
             SetBndVelocity(2);
 
             // z dimension
-            for (k = 0; k < 20; k++) {
+            for (k = 0; k < 10; k++) {
                 for (int i = 0; i < nonBoundaryCells.Count; i++) {
                     Cell currCell = nonBoundaryCells[i].GetComponent<Cell>();
                     float velocitySum = 0;
@@ -415,7 +417,7 @@ public class FluidGrid : MonoBehaviour
         SetBndDiv(); // set bnd div
         // set bnd p
 
-        for (int k = 0 ; k < 20 ; k++) {
+        for (int k = 0 ; k < 10; k++) {
             for (int i = 0; i < nonBoundaryCells.Count; i++) {
                 Cell currCell = nonBoundaryCells[i].GetComponent<Cell>();
 
@@ -434,6 +436,7 @@ public class FluidGrid : MonoBehaviour
 
             currCell.velocityCurrent.x -= 0.33f * (currCell.right.GetComponent<Cell>().p -  currCell.left.GetComponent<Cell>().p) / cubeDimension;
             currCell.velocityCurrent.y -= 0.33f * (currCell.up.GetComponent<Cell>().p - currCell.down.GetComponent<Cell>().p) / cubeDimension;
+            // currCell.velocityCurrent.y -= 9.8f; // also add gravity
             currCell.velocityCurrent.z -= 0.33f * (currCell.front.GetComponent<Cell>().p - currCell.back.GetComponent<Cell>().p) / cubeDimension;
         }
         SetBndVelocity(1);

@@ -30,9 +30,22 @@ public class Cell : MonoBehaviour
     public float div;
     public float p;
 
+    public Color cellColor; 
+
+    public float waveHeight = 0.5f;
+    public float waveFrequency = 0.5f;
+    public float waveSpeed = 0.01f;
+    private float wavePhase;
+
+    private void Awake()
+    {
+        wavePhase = Random.Range(0f, Mathf.PI * 2f);
+    } 
+
     // Start is called before the first frame update
     void Start()
     {
+        cellColor = Color.cyan;
         // find neighbors
         right = FindRightNeighbor();
         left = FindLeftNeighbor();
@@ -49,7 +62,6 @@ public class Cell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
 
     }
 
@@ -136,6 +148,7 @@ public class Cell : MonoBehaviour
    public void AddSourceToCell(float source)
    {
        densitySource = densitySource + source;
+    //    cellColor = Random.ColorHSV();
    }
 
    public void AddVelocitySourceToCell(Vector3 source)
@@ -145,14 +158,40 @@ public class Cell : MonoBehaviour
 
    public void RenderDensity() // might want to change rendering later
    {
-        // densityCurrent = Mathf.Max(0.012f, densityCurrent);
-        if (densityCurrent > 0.05f) {
+        if (densityCurrent > 0.01f) {
             gameObject.GetComponent<Renderer>().enabled = true;
-            Color c = GetComponent<Renderer>().material.color = Color.blue;
-            gameObject.GetComponent<Renderer>().material.color = new Color(c.r, c.g, c.b, Mathf.Min(densityCurrent, 1.0f));
+            densityCurrent = Mathf.Max(0.012f, densityCurrent);
+            Color c = cellColor;
+            if (densityCurrent < 0.1f) {
+                c = Color.white;
+            }
+            if (right) {
+                c = Color.Lerp(cellColor, right.GetComponent<Cell>().cellColor, densityCurrent);
+            }
+            if (left) {
+                c = Color.Lerp(c, left.GetComponent<Cell>().cellColor, densityCurrent);
+            }
+            if (up) {
+                c = Color.Lerp(c, up.GetComponent<Cell>().cellColor, densityCurrent);
+            }
+            if (down) {
+                c = Color.Lerp(c, down.GetComponent<Cell>().cellColor, densityCurrent);
+            }
+            if (front) {
+                c = Color.Lerp(c, front.GetComponent<Cell>().cellColor, densityCurrent);
+            }
+            if (back) {
+                c = Color.Lerp(c, back.GetComponent<Cell>().cellColor, densityCurrent);
+            }
+
+            gameObject.GetComponent<Renderer>().material.color = new Color(c.r, c.g, c.b, Mathf.Min(Mathf.Min(densityCurrent, 0.5f), 1.0f));
+
         } else {
-            gameObject.GetComponent<Renderer>().enabled = false;
+            gameObject.GetComponent<Renderer>().enabled = false; // set this when the density is non zero
         }
+
+
+
       
    }
 
