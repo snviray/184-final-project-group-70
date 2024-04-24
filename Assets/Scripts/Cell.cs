@@ -42,6 +42,12 @@ public class Cell : MonoBehaviour
         wavePhase = Random.Range(0f, Mathf.PI * 2f);
     } 
 
+    void OnMouseOver()
+    {
+        Debug.Log("Hover");
+        AddSourceToCell(-10f); // todo, change this later to maybe be user input in a UI box
+    }
+
     // Start is called before the first frame update
     void Start()
     {

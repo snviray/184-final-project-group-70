@@ -9,6 +9,8 @@ public class WaterMotion : MonoBehaviour
     public float waveHeight = 0.5f;
     public float waveFrequency = 0.5f;
     public float waveLength = 2f;
+    public float edgeFalloff = 1f; // Edge smoothness
+
 
     private Vector3[] originalVertices;
     private Mesh mesh;
@@ -25,7 +27,8 @@ public class WaterMotion : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             Vector3 vertex = originalVertices[i];
-            vertex.y += waveHeight * Mathf.Sin(Time.time * waveFrequency + originalVertices[i].x * waveLength) * Random.Range(0f, 0.5f);
+            float edgeFactor = 1 - Mathf.Clamp01((Mathf.Abs(vertex.x - 0.5f) + Mathf.Abs(vertex.z - 0.5f)) * edgeFalloff);
+            vertex.y += waveHeight * Mathf.Sin(Time.time * waveFrequency + originalVertices[i].x * waveLength) * edgeFactor * Random.Range(0f, 0.5f);
             vertices[i] = vertex;
         }
         mesh.vertices = vertices;
