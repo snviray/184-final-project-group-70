@@ -5,6 +5,9 @@ using UnityEngine;
 public class FluidGrid : MonoBehaviour
 {
     public float cubeDimension;
+    public float cubeDimensionX;
+    public float cubeDimensionY;
+    public float cubeDimensionZ;
     [SerializeField]
     GameObject cellPrefab;
     [SerializeField]
@@ -17,6 +20,10 @@ public class FluidGrid : MonoBehaviour
     public float visc = 10f; // viscosity constant
     [SerializeField]
     public int N;
+    [SerializeField]
+    public int M;
+    [SerializeField]
+    public int O;
     public Vector3 velocitySource;
     private int gridX;
     private int gridY;
@@ -45,18 +52,21 @@ public class FluidGrid : MonoBehaviour
     public void Start()
     {
         // set constants
-        gridX = N + 2;
+        gridX = M + 2;
         gridY = N + 2;
-        gridZ = N + 2;
+        gridZ = O + 2;
         cubeDimension = (float) 1 / N;
+        cubeDimensionX = (float) 1 / M;
+        cubeDimensionY = (float) 1 / N;
+        cubeDimensionZ = (float) 1 / O;
         cornerCellsIndices.Add(new Vector3(0, 0, 0));
-        cornerCellsIndices.Add(new Vector3(0, 0, N + 1));
-        cornerCellsIndices.Add(new Vector3(N + 1, 0, 0));
-        cornerCellsIndices.Add(new Vector3(N + 1, N + 1, N + 1));
+        cornerCellsIndices.Add(new Vector3(0, 0, O + 1));
+        cornerCellsIndices.Add(new Vector3(M + 1, 0, 0));
+        cornerCellsIndices.Add(new Vector3(M + 1, N + 1, O + 1));
         cornerCellsIndices.Add(new Vector3(0, N + 1, 0));
-        cornerCellsIndices.Add(new Vector3(0, N + 1, N + 1));
-        cornerCellsIndices.Add(new Vector3(N + 1, N + 1, 0));
-        cornerCellsIndices.Add(new Vector3(N + 1, 0,  N + 1));
+        cornerCellsIndices.Add(new Vector3(0, N + 1, O + 1));
+        cornerCellsIndices.Add(new Vector3(M + 1, N + 1, 0));
+        cornerCellsIndices.Add(new Vector3(M + 1, 0,  O + 1));
         MakeGrid();
     }
     // Update is called once per frame
@@ -65,13 +75,13 @@ public class FluidGrid : MonoBehaviour
         timer += Time.deltaTime;
         if (timer >= dt) {
             // every timestep generate a source in a random Source
-            GameObject chosen = nonBoundaryCells[(int) Random.Range(0, nonBoundaryCells.Count - 1)];
+            // GameObject chosen = nonBoundaryCells[(int) Random.Range(0, nonBoundaryCells.Count - 1)];
             // chosen.GetComponent<Cell>().AddSourceToCell(Random.Range(0f, 0.99f));
             
             // add density and velocity to random cell
             if (Random.Range(0, 100) < 50) {
                 // chosen.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f, 0f));
-                // source.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-5f, 0f, 0f));
+                source.GetComponent<Cell>().AddVelocitySourceToCell(new Vector3(-10f, 0f, 0f));
             if (Random.Range(0, 100) < 50 || !added) {
                 source.GetComponent<Cell>().AddSourceToCell(5f);
                 // chosen.GetComponent<Cell>().AddSourceToCell(1f);
@@ -116,13 +126,13 @@ public class FluidGrid : MonoBehaviour
             return;
         }
 
-        if (locIndices == new Vector3(5, 9, 5)) {
+        if (locIndices == new Vector3(2, 2, 2)) {
             source = cell;
         }
         // add to array of boundary cells if necessary
         if (x == 0) {
             leftCells.Add(cell);
-        } else if (x == N + 1) {
+        } else if (x == M + 1) {
             rightCells.Add(cell);
         } else if (y == 0) {
             bottomCells.Add(cell);
@@ -130,7 +140,7 @@ public class FluidGrid : MonoBehaviour
             topCells.Add(cell);
         } else if (z == 0) {
             frontCells.Add(cell);
-        } else if (z == N + 1) {
+        } else if (z == O + 1) {
             backCells.Add(cell);
         } else {
             nonBoundaryCells.Add(cell);
@@ -293,6 +303,8 @@ public class FluidGrid : MonoBehaviour
         for (int i = 0; i < cells.Length; i++) {
             Cell currCell = cells[i].GetComponent<Cell>();
             currCell.RenderDensity();
+            cells[i].transform.position = cells[i].transform.position + currCell.velocityPast * dt;
+
         }
     }
     void SetBndDensity()
@@ -332,7 +344,7 @@ public class FluidGrid : MonoBehaviour
         c1.densitySource =  0.33f * (c1.right.GetComponent<Cell>().densitySource + c1.up.GetComponent<Cell>().densitySource + c1.back.GetComponent<Cell>().densitySource);
 
         // (0, 0, 1)
-        Vector3 v2 = new Vector3(0, 0, N + 1);
+        Vector3 v2 = new Vector3(0, 0, O + 1);
         GameObject c2Object = cornerCells[v2];
         Cell c2 = c2Object.GetComponent<Cell>();
         // average of front, right, and top
@@ -346,35 +358,35 @@ public class FluidGrid : MonoBehaviour
         c3.densitySource =  0.33f * (c3.down.GetComponent<Cell>().densitySource + c3.back.GetComponent<Cell>().densitySource + c3.right.GetComponent<Cell>().densitySource);
 
         // (0, 1, 1)
-        Vector3 v4 = new Vector3(0, N + 1, N + 1);
+        Vector3 v4 = new Vector3(0, N + 1, O + 1);
         GameObject c4Object = cornerCells[v4];
         Cell c4 = c4Object.GetComponent<Cell>();
         // average of front, right, and bottom
         c4.densityCurrent =  0.33f * (c4.front.GetComponent<Cell>().densitySource + c4.right.GetComponent<Cell>().densitySource + c4.down.GetComponent<Cell>().densitySource);
 
         // (1, 1, 0)
-        Vector3 v5 = new Vector3(N + 1, N + 1, 0);
+        Vector3 v5 = new Vector3(M + 1, N + 1, 0);
         GameObject c5Object = cornerCells[v5];
         Cell c5 = c5Object.GetComponent<Cell>();
         // back, left, bottom
         c5.densitySource =  0.33f * (c5.back.GetComponent<Cell>().densitySource + c5.left.GetComponent<Cell>().densitySource + c5.down.GetComponent<Cell>().densitySource);
 
         // (1, 0, 0)
-        Vector3 v6 = new Vector3(N + 1, 0, 0);
+        Vector3 v6 = new Vector3(M + 1, 0, 0);
         GameObject c6Object = cornerCells[v6];
         Cell c6 = c6Object.GetComponent<Cell>();
         // top, left , back
         c6.densitySource =  0.33f * (c6.up.GetComponent<Cell>().densitySource + c6.left.GetComponent<Cell>().densitySource + c6.back.GetComponent<Cell>().densitySource);
 
         // (1, 0, 1)
-        Vector3 v7 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v7 = new Vector3(M + 1, 0, O + 1);
         GameObject c7Object = cornerCells[v7];
         Cell c7 = c7Object.GetComponent<Cell>();
         // front, top, left
         c7.densitySource =  0.33f * (c7.front.GetComponent<Cell>().densitySource + c7.up.GetComponent<Cell>().densitySource + c7.left.GetComponent<Cell>().densitySource);
 
         // (1, 1, 1)
-        Vector3 v8 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v8 = new Vector3(M + 1, 0, O + 1);
         GameObject c8Object = cornerCells[v8];
         Cell c8 = c8Object.GetComponent<Cell>();
         // front, bottom, left
@@ -515,7 +527,7 @@ void SetBndVelocity(int b)
 
 
         // (0, 0, 1)
-        Vector3 v2 = new Vector3(0, 0, N + 1);
+        Vector3 v2 = new Vector3(0, 0, O + 1);
         GameObject c2Object = cornerCells[v2];
         Cell c2 = c2Object.GetComponent<Cell>();
         // average of front, right, and top
@@ -535,7 +547,7 @@ void SetBndVelocity(int b)
 
 
         // (0, 1, 1)
-        Vector3 v4 = new Vector3(0, N + 1, N + 1);
+        Vector3 v4 = new Vector3(0, N + 1, O + 1);
         GameObject c4Object = cornerCells[v4];
         Cell c4 = c4Object.GetComponent<Cell>();
         // average of front, right, and bottom
@@ -545,7 +557,7 @@ void SetBndVelocity(int b)
 
 
         // (1, 1, 0)
-        Vector3 v5 = new Vector3(N + 1, N + 1, 0);
+        Vector3 v5 = new Vector3(M + 1, N + 1, 0);
         GameObject c5Object = cornerCells[v5];
         Cell c5 = c5Object.GetComponent<Cell>();
         // back, left, bottom
@@ -555,7 +567,7 @@ void SetBndVelocity(int b)
 
 
         // (1, 0, 0)
-        Vector3 v6 = new Vector3(N + 1, 0, 0);
+        Vector3 v6 = new Vector3(M + 1, 0, 0);
         GameObject c6Object = cornerCells[v6];
         Cell c6 = c6Object.GetComponent<Cell>();
         // top, left , back
@@ -564,14 +576,14 @@ void SetBndVelocity(int b)
 
        
         // (1, 0, 1)
-        Vector3 v7 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v7 = new Vector3(M + 1, 0, O + 1);
         GameObject c7Object = cornerCells[v7];
         Cell c7 = c7Object.GetComponent<Cell>();
         // front, top, left
         c7.velocitySource =  0.33f * (c7.front.GetComponent<Cell>().velocitySource + c7.up.GetComponent<Cell>().velocitySource + c7.left.GetComponent<Cell>().velocitySource);
 
         // (1, 1, 1)
-        Vector3 v8 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v8 = new Vector3(M + 1, 0, O + 1);
         GameObject c8Object = cornerCells[v8];
         Cell c8 = c8Object.GetComponent<Cell>();
         // front, bottom, left
@@ -621,7 +633,7 @@ void SetBndVelocity(int b)
         c1.p =  0.33f * (c1.right.GetComponent<Cell>().p + c1.up.GetComponent<Cell>().p + c1.back.GetComponent<Cell>().p);
 
         // (0, 0, 1)
-        Vector3 v2 = new Vector3(0, 0, N + 1);
+        Vector3 v2 = new Vector3(0, 0, O + 1);
         GameObject c2Object = cornerCells[v2];
         Cell c2 = c2Object.GetComponent<Cell>();
         // average of front, right, and top
@@ -635,35 +647,35 @@ void SetBndVelocity(int b)
         c3.p =  0.33f * (c3.down.GetComponent<Cell>().p + c3.back.GetComponent<Cell>().p + c3.right.GetComponent<Cell>().p);
 
         // (0, 1, 1)
-        Vector3 v4 = new Vector3(0, N + 1, N + 1);
+        Vector3 v4 = new Vector3(0, N + 1, O + 1);
         GameObject c4Object = cornerCells[v4];
         Cell c4 = c4Object.GetComponent<Cell>();
         // average of front, right, and bottom
         c4.p =  0.33f * (c4.front.GetComponent<Cell>().p + c4.right.GetComponent<Cell>().p + c4.down.GetComponent<Cell>().p);
 
         // (1, 1, 0)
-        Vector3 v5 = new Vector3(N + 1, N + 1, 0);
+        Vector3 v5 = new Vector3(M + 1, N + 1, 0);
         GameObject c5Object = cornerCells[v5];
         Cell c5 = c5Object.GetComponent<Cell>();
         // back, left, bottom
         c5.densitySource =  0.33f * (c5.back.GetComponent<Cell>().p + c5.left.GetComponent<Cell>().p + c5.down.GetComponent<Cell>().p);
 
         // (1, 0, 0)
-        Vector3 v6 = new Vector3(N + 1, 0, 0);
+        Vector3 v6 = new Vector3(M + 1, 0, 0);
         GameObject c6Object = cornerCells[v6];
         Cell c6 = c6Object.GetComponent<Cell>();
         // top, left , back
         c6.densitySource =  0.33f * (c6.up.GetComponent<Cell>().p + c6.left.GetComponent<Cell>().p + c6.back.GetComponent<Cell>().p);
 
         // (1, 0, 1)
-        Vector3 v7 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v7 = new Vector3(M + 1, 0, O + 1);
         GameObject c7Object = cornerCells[v7];
         Cell c7 = c7Object.GetComponent<Cell>();
         // front, top, left
         c7.densitySource =  0.33f * (c7.front.GetComponent<Cell>().p + c7.up.GetComponent<Cell>().p + c7.left.GetComponent<Cell>().p);
 
         // (1, 1, 1)
-        Vector3 v8 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v8 = new Vector3(M + 1, 0, O + 1);
         GameObject c8Object = cornerCells[v8];
         Cell c8 = c8Object.GetComponent<Cell>();
         // front, bottom, left
@@ -710,7 +722,7 @@ void SetBndVelocity(int b)
         c1.div =  0.33f * (c1.right.GetComponent<Cell>().div + c1.up.GetComponent<Cell>().div + c1.back.GetComponent<Cell>().div);
 
         // (0, 0, 1)
-        Vector3 v2 = new Vector3(0, 0, N + 1);
+        Vector3 v2 = new Vector3(0, 0, O + 1);
         GameObject c2Object = cornerCells[v2];
         Cell c2 = c2Object.GetComponent<Cell>();
         // average of front, right, and top
@@ -724,35 +736,35 @@ void SetBndVelocity(int b)
         c3.div =  0.33f * (c3.down.GetComponent<Cell>().div + c3.back.GetComponent<Cell>().div + c3.right.GetComponent<Cell>().div);
 
         // (0, 1, 1)
-        Vector3 v4 = new Vector3(0, N + 1, N + 1);
+        Vector3 v4 = new Vector3(0, N + 1, O + 1);
         GameObject c4Object = cornerCells[v4];
         Cell c4 = c4Object.GetComponent<Cell>();
         // average of front, right, and bottom
         c4.div =  0.33f * (c4.front.GetComponent<Cell>().div + c4.right.GetComponent<Cell>().div + c4.down.GetComponent<Cell>().div);
 
         // (1, 1, 0)
-        Vector3 v5 = new Vector3(N + 1, N + 1, 0);
+        Vector3 v5 = new Vector3(M + 1, N + 1, 0);
         GameObject c5Object = cornerCells[v5];
         Cell c5 = c5Object.GetComponent<Cell>();
         // back, left, bottom
         c5.densitySource =  0.33f * (c5.back.GetComponent<Cell>().div + c5.left.GetComponent<Cell>().div + c5.down.GetComponent<Cell>().div);
 
         // (1, 0, 0)
-        Vector3 v6 = new Vector3(N + 1, 0, 0);
+        Vector3 v6 = new Vector3(M + 1, 0, 0);
         GameObject c6Object = cornerCells[v6];
         Cell c6 = c6Object.GetComponent<Cell>();
         // top, left , back
         c6.densitySource =  0.33f * (c6.up.GetComponent<Cell>().div + c6.left.GetComponent<Cell>().div + c6.back.GetComponent<Cell>().div);
 
         // (1, 0, 1)
-        Vector3 v7 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v7 = new Vector3(M + 1, 0, O + 1);
         GameObject c7Object = cornerCells[v7];
         Cell c7 = c7Object.GetComponent<Cell>();
         // front, top, left
         c7.densitySource =  0.33f * (c7.front.GetComponent<Cell>().div+ c7.up.GetComponent<Cell>().div + c7.left.GetComponent<Cell>().div);
 
         // (1, 1, 1)
-        Vector3 v8 = new Vector3(N + 1, 0, N + 1);
+        Vector3 v8 = new Vector3(M + 1, 0, O + 1);
         GameObject c8Object = cornerCells[v8];
         Cell c8 = c8Object.GetComponent<Cell>();
         // front, bottom, left

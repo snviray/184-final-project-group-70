@@ -45,7 +45,8 @@ public class Cell : MonoBehaviour
     void OnMouseOver()
     {
         Debug.Log("Hover");
-        AddSourceToCell(-10f); // todo, change this later to maybe be user input in a UI box
+        AddSourceToCell(10f); // todo, change this later to maybe be user input in a UI box
+        AddVelocitySourceToCell(new Vector3(10f, 0f, 0f));
     }
 
     // Start is called before the first frame update
@@ -59,7 +60,7 @@ public class Cell : MonoBehaviour
         down = FindDownNeighbor();
         front = FindFrontNeighbor();
         back = FindBackNeighbor();
-        gameObject.GetComponent<Renderer>().enabled = false; // set this when the density is non zero
+        // gameObject.GetComponent<Renderer>().enabled = false; // set this when the density is non zero
         densityCurrent = 0f;
         velocityCurrent = new Vector3(0f, 0f, 0f);
         densityPast = 0f;
@@ -68,7 +69,7 @@ public class Cell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
   // Note: To get these to work, I made the prefab's collision box smaller

@@ -29,9 +29,13 @@ public class WaterMotion : MonoBehaviour
             Vector3 vertex = originalVertices[i];
             float edgeFactor = 1 - Mathf.Clamp01((Mathf.Abs(vertex.x - 0.5f) + Mathf.Abs(vertex.z - 0.5f)) * edgeFalloff);
             vertex.y += waveHeight * Mathf.Sin(Time.time * waveFrequency + originalVertices[i].x * waveLength) * edgeFactor * Random.Range(0f, 0.5f);
+            vertex.x += waveHeight * Mathf.Sin(Time.time * waveFrequency + originalVertices[i].x * waveLength) * edgeFactor * Random.Range(0f, 0.5f);
+            vertex.z += waveHeight * Mathf.Sin(Time.time * waveFrequency + originalVertices[i].x * waveLength) * edgeFactor * Random.Range(0f, 0.5f);
             vertices[i] = vertex;
         }
         mesh.vertices = vertices;
         mesh.RecalculateNormals();  // Recalculate normals to reflect the new vertex positions
     }
+
+
 }
