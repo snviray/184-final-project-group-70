@@ -52,7 +52,7 @@ public class Cell : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cellColor = Color.cyan;
+       cellColor = gameObject.GetComponent<Renderer>().material.color;
         // find neighbors
         right = FindRightNeighbor();
         left = FindLeftNeighbor();
