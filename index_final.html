@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Simulation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#"><span>&#127754;</span> CS 184</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#abstract">Abstract</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#technical approach">Technical Approach</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#results">Results</a>
+                </li>
+            </ul>
+        </div>
+    </nav>    
+
+    <!-- Header -->
+    <header class="container mt-5">
+        <h1 class="text-center">Final Project MileStone: Water Simulation</h1>
+        <h6 class="text-center"><i>Sara Viray, Sue Young Shim, Amrita Moturi, Mariana Vasquez</i></h6>
+    </header>
+
+    <!-- Final Video -->
+    <section class="container mt-5">
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe src="https://drive.google.com/file/d/1_ghc15QPKudthnJUXzh5JCgjidH6hwjM/preview" width="640" height="480" allow="autoplay"></iframe>
+        </div>
+        <p><b>Final Project Video</b></p>
+    </section>
+
+    <!-- Abstract -->
+    <section id="abstract" class="container mt-5">
+        <h2>Abstract</h2>
+        <p>
+            This project aims to tackle the challenge of creating a realistic simulation of fluids, specifically water that can be used in crafting immersive virtual experiences. This problem is challenging because the Navier-Stokes Equations, which capture the underlying physics governing fluid dynamics simulations, are complex to solve for standard PCs and game consoles. Therefore, our goal in our implementation was to create realistic fluid simulations within the constraints of typical computing hardware. Utilizing a 3D grid mesh and Eulerian Fluid Dynamics, we were able to model changing the velocity and density of water, in various demo scenes like a pool.
+        </p>
+        
+    </section>
+
+    <!-- Technical Approach -->
+    <section id="technical approach" class="container mt-5">
+        <h2>Technical Approach</h2>
+        <p><b>A 1-2 page summary of your technical approach</b></p>
+
+        <p>Our approach begins with creating a 3D grid to split up the visual space into blocks, each with a dynamic velocity and density and front, back, up, down, left, and right neighbors to create relationships between each cell. Next, we implemented a method to calculate the change in density for each block assuming a constant velocity field and outside sources added. We developed a method to calculate density changes within each block, incorporating a constant velocity field and external sources. To simulate density exchanges between neighboring cells, we implemented diffusion using Gauss-Seidel relaxation to solve for density at the previous time step. Advection, crucial for simulating density flow based on a velocity field, was achieved through a linear backtrace approach as outlined in the paper, 'Real-Time Fluid Dynamics for Games,' treating densities as particles and tracing their paths through the velocity field. The densities were trilinearly interpolated at the backtraced position with the 8 surrounding cells. The focus then shifted to developing a velocity solver, which accounts for forces, viscous diffusion, and self-advection. Velocity updates, necessary for diffusion, were executed alongside a method called project(), utilizing Gauss-Seidel relaxation to enforce incompressibility and conserve mass. Finally, the SetBoundary() function was implemented to simulate fluid containment, ensuring proper boundary conditions for both density and velocity within each cell. 
+            </p>
+        <p>Our approach deviated from the methodology outlined in the paper we primarily referenced, 'Real-Time Fluid Dynamics for Games,' by expanding upon their framework for rendering fluid dynamics simulations from 2D to 3D. To enhance the realism of the water simulation, we introduced modifications to the mesh boundaries, shaping them according to a sine function to create a wave-like visual effect. Moreover, we introduced a novel visualization technique aimed at modeling the physical properties of water in a pool. Unlike the paper's approach, which utilized cube meshes, we adjusted the dimensions of the mesh to form a rectangular prism with a shallower depth, offering a more accurate representation of water bodies.
+            Furthermore, we optimized the mesh structure introduced in the paper to facilitate more efficient neighbor look-up operations for each cell, which we used pointers for this purpose. Additionally, while the paper primarily focused on smoke simulations, we tailored our simulations and rendering exclusively for water dynamics. Lastly, we adapted the original implementation, coded in C#, to seamlessly integrate with the Unity game engine, enhancing its accessibility and usability within the gaming environment.</p>
+            
+            <p>
+            We implemented methods to render the fluid because it was not described in the paper how to do so. To render the color, we set the alpha channel of each cell to be dependent on the density. Since the  alpha channel goes from 0 to 1, we had to clamp the density values for rendering. We added random waves by adding oscillations with a sine function that controls the amplitude, frequency, and wavelength. We used a directional light game object in Unity to create shadow effects and more realistic lighting effects. Plus, we added an edge-smoothing factor to multiply against the render values in the water simulation to create a smoother effect during movement.
+            </p>
+
+        <section class="container mt-5">
+            <h5>Navier-Stokes Equations</h5>
+            <div class="mt-3">
+                <div>\[
+                    \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\frac{1}{\rho} \nabla p + \nu \nabla^2 \mathbf{u}
+                \]</div>
+            </div>
+        </section>
+        <section class="container mt-5">
+            <h5>Equation for Density Moving Through Velocity Field</h5>
+            <div class="mt-3">
+                <div>\[
+                    \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0
+                \]</div>
+            </div>
+        </section>
+        
+
+        <p><b>A description of problems encountered and how you tackled them</b></p>
+        <p>
+            When our team first started writing code, we were primarily concerned with structuring the files in a way that best made sense for our simulation goals. Our team landed on having a FluidCells.cs file for the main functions of the overall simulation and a Cell.cs file that would define variables and methods for a single Cell instance (representing a single block of water. This choice of structure differs from the paper that we are implementing so we had to account for these differences when implementing main functions such as project and advect. The paper represents the grid as vectors, while we are representing them as objects pointers to neighbors.
+        </p>
+        <p>
+            We also learned about the limitations of the Unity Engine when too many game objects/ cells were spawned. The program became unresponsive if the grid size is too high, so we had to try different numbers and implement an option to create a prism grid in order to have okay performance.
+        </p>
+        <p>
+            Thus, an issue we ran into was adapting the pseudocode from the paper to Unity objects. Since we have chosen to use Unity as our engine, we needed to make the appropriate changes to follow the proper syntax. On the other hand, the paper uses its own custom GUI. Another issue we faced was coming up with a way to render the density in a visually realistic manner. We have played around with the opacity to resolve this and changing other variables but we are still working through this issue.
+        </p>
+        <p><b>A description of lessons learned</b></p>
+        <p> One of the lessons we learned in the late stages of the project was how shading and the rendered environment can really
+             affect how realistic a simulation can look. We had to play around a lot with different ideas for shaders to find a
+            visualization that we were happy with. We also played around with opacity and the lightness/darkness of the blue in
+            relation to density. Another lesson that we learned is how to use clamping for values that get too big in our code.
+            We had to clamp the density, as it had a tendency to get too big and change the color of the water in an unintended manner. We also learned how setting boundaries can limit the visualizations and we had to play with the dimensions. Finally, we learned about viscosity and diffusion concepts and their importance when forming a water simulation.
+        </p>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="container mt-5">
+        <h2>Results</h2>
+        
+        <div style="display: flex; justify-content: center;">
+            <img src="waterSim.gif" alt="the gif" style="width: 300px; height: 200px;" />
+        </div>
+        
+        <p>
+            Our current results showcase our simulation in Unity, in which a user can add fluid particles to the scene. The user can modify the fluid’s density and velocity to model the movement of different particles based on their properties and the Navier-Stokes equations. Clicking on the Unity display will render a water particle randomly generated in space, which diffuses into the nearby areas based on our diffusion function. The “swirling” effect is the result of implementing advect() and project(), which enforces the velocity to be mass conserving, forcing the flow to have this vortex appearance. The user can also modify simulation settings to modify the diffusion rates, fluid viscosity, the total number of grid cells, and timestep.
+        </p>
+    </section>
+
+    <!-- Video -->
+    <section class="container mt-5">
+        <h2>Demo Scene</h2>
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe src="https://drive.google.com/file/d/1x9--gH7xpiG-m61vD25MVM9WnF6pciWo/preview" width="480" height="360" allow="autoplay"></iframe>
+        </div>
+    </section>
+
+    <!-- Presentation Slides -->
+    <section class="container mt-5">
+        <h2>Presentation Slides</h2>
+        <!-- You can embed your slides here -->
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRcNhfIUvvCaqttifgt6_U03vNAecIc5CuCVzyDwijnVi2jnqeAzt9rj-v0RIOb8F08I3fog9uVo6rA/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        </div>
+    </section>
+
+    <!-- References -->
+    <section id="References" class="container mt-5">
+        <h2>References</h2>
+        <ul>
+            <li>
+                <a href="https://drive.google.com/file/d/1z_Uv_P9FqKf3ts6AJdIGNANyHsVMmehp/view">Real-Time Fluid Dynamics for Games.pdf</a>
+            </li>
+            <li>
+                <a href="https://www.youtube.com/watch?v=qsYE1wMEMPA&t=2s">How do Fluid Simulations Work?</a>
+            </li>
+            <li>
+                <a href="https://github.com/IRCSS/Compute-Shaders-Fluid-Dynamic-?tab=readme-ov-file">Reference 2D Unity implementation</a>
+            </li>
+            <li>
+                <a href="https://github.com/CFusion-zz/Real-Time-Fluid-Dynamics-for-Games">Reference 2D Github Implementation in C</a>
+            </li>
+            <li>
+                <a href="https://shahriyarshahrabi.medium.com/gentle-introduction-to-fluid-simulation-for-programmers-and-technical-artists-7c0045c40bac">Gentle Introduciton to Fluid Simulation</a>
+            </li>
+            <li>
+                <a href="https://www.youtube.com/watch?v=alhpH6ECFvQ">Coding Challenge #132 (Render the Density Chapter)</a>
+            </li>
+            <li>
+                <a href="https://docs.unity3d.com/Manual/SL-VertexFragmentShaderExamples.html">How to make Unity Fragment Shader</a>
+            </li>
+            <li>
+                <a href="https://assetstore.unity.com/packages/3d/environments/fantasy/flat-cube-environment-195664">3D Cube Environment Assets (Tree and rock models, and materials)</a>
+            </li>
+            <li>Reference/Inspiration Simulations
+                <ul>
+                    <li>
+                        <a href="https://www.youtube.com/watch?v=7uVLBosJu2E">3D Smoke</a>
+                    </li>
+                    <li>
+                        <a href="https://www.youtube.com/watch?v=rW9ZkVMUmqs">2D Smoke/Pond</a>
+                    </li>
+                    <li>
+                        <a href="https://www.youtube.com/watch?v=GkrQy5JUyZk&embeds_widget_referrer=https%3A%2F%2Fshahriyarshahrabi.medium.com%2Fgentle-introduction-to-fluid-simulation-for-programmers-and-technical-artists-7c0045c40bac&embeds_referring_euri=https%3A%2F%2Fcdn.embedly.com%2F&embeds_referring_origin=https%3A%2F%2Fcdn.embedly.com&source_ve_path=MjM4NTE&feature=emb_title">Pond Simulation with Shader</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Contributions -->
+    <section id="Contributions" class="container mt-5">
+        <h2>Contributions</h2>
+        <ul>
+            <li><i>Sara Viray</i></li>
+                <ul>
+                    <li>Worked on to generating the grid and creating references to neighbors. Helped with the diffusion calculation method, rendering the cells, creating demo scenes and videos.</li>
+                </ul>
+            <li><i>Sue Young Shim</i></li>
+                <ul>
+                    <li>Implemented linear interpolation, advection, camera control, and wave motion.</li>
+                </ul>
+            <li><i>Amrita Moturi</i></li>
+                <ul>
+                    <li>Contributed to the final project write-up, including the abstract and technical approach sections. Also worked on the project() method for diffusion.</li>
+                </ul>
+            <li><i>Mariana Vasquez</i>
+                <ul>
+                    <li>Worked on the diffusion and project calculation method. Put together the website for the midpoint and final deliverables.</li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-3">
+        <div class="container text-center">
+            <p> Spring 2024 CS184 Final Project. UC Berkeley</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
